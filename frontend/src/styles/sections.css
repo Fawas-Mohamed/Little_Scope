@@ -1,0 +1,15 @@
+/* shared section system: same palette, type and spacing everywhere */
+.sec{position:relative;padding:clamp(72px,10vw,140px) clamp(20px,6vw,96px)}
+.sec-inner{max-width:1280px;margin:0 auto}
+.kicker{margin:0;display:flex;align-items:center;gap:14px;font:500 12px/1 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--ink)}
+.kicker::after{content:"";width:70px;height:1px;background:var(--accent)}
+.sec-title{margin:16px 0 0;font:400 clamp(40px,5.2vw,72px)/1.04 'Cormorant Garamond',serif;letter-spacing:-.01em;color:var(--ink)}
+.sec-title em{font-style:italic;color:var(--accent)}
+.lead{margin:0;font:400 clamp(16px,1.25vw,18px)/1.7 Inter,sans-serif;color:var(--ink-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:54px;padding:0 30px;border-radius:999px;background:var(--btn);color:var(--btn-text);font:600 13px/1 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;transition:transform .3s var(--ease),background .3s,color .3s}
+.btn:hover{transform:translateY(-2px);background:#52271f}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}.btn.ghost:hover{background:var(--ink);color:var(--btn-text)}
+.btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) var(--d,0s),transform .9s var(--ease) var(--d,0s)}
+.in .rv,.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}

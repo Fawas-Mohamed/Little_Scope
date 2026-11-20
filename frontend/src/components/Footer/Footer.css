@@ -1,0 +1,32 @@
+.footer{background:var(--ink);color:#F6E6E0;padding:clamp(64px,8vw,110px) clamp(20px,6vw,96px) 28px;position:relative;overflow:hidden}
+.footer::before{content:"";position:absolute;left:50%;top:-30%;width:90%;aspect-ratio:2/1;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(201,135,126,.28),transparent);pointer-events:none}
+.foot-inner{position:relative;max-width:1280px;margin:0 auto}
+.foot-cta{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-bottom:clamp(40px,5vw,72px);border-bottom:1px solid rgba(246,230,224,.16)}
+.foot-cta h2{margin:0;max-width:760px;font:400 clamp(36px,4.8vw,66px)/1.06 'Cormorant Garamond',serif;letter-spacing:-.01em}
+.foot-cta h2 em{font-style:italic;color:#E9ACA9}
+.btn.light{background:#FCEDEA;color:var(--ink)}.btn.light:hover{background:#fff}
+.foot-grid{display:grid;grid-template-columns:1.3fr .8fr 1fr 1.2fr;gap:clamp(28px,4vw,64px);padding:clamp(40px,5vw,72px) 0}
+.foot-logo{font:800 40px/1 'Baloo 2',cursive;letter-spacing:-.02em;color:#FCEDEA}
+.foot-brand p{margin:16px 0 0;max-width:320px;font:italic 400 22px/1.35 'Cormorant Garamond',serif;color:#E8CFC8}
+.socials{display:flex;gap:10px;margin-top:22px}
+.socials a{width:44px;height:44px;border:1px solid rgba(246,230,224,.28);border-radius:50%;display:grid;place-items:center;transition:background .3s,color .3s,transform .3s var(--ease)}
+.socials a:hover{background:#FCEDEA;color:var(--ink);transform:translateY(-3px)}
+.socials svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.foot-col h3,.foot-news h3{margin:0 0 18px;font:500 12px/1 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#E9ACA9}
+.foot-col{display:flex;flex-direction:column;align-items:flex-start}
+.foot-col a{padding:6px 0;font:400 15px/1.4 Inter,sans-serif;color:#F6E6E0;position:relative;transition:color .3s,transform .3s var(--ease)}
+.foot-col a:hover{color:#fff;transform:translateX(4px)}
+.foot-col p{margin:0 0 14px;font:400 15px/1.6 Inter,sans-serif;color:#E8CFC8}
+.foot-news p{margin:0 0 18px;font:400 15px/1.55 Inter,sans-serif;color:#E8CFC8;max-width:320px}
+.field{display:flex;align-items:center;max-width:360px;height:54px;padding:0 6px 0 22px;border:1px solid rgba(246,230,224,.3);border-radius:999px;transition:border-color .3s}
+.field:focus-within{border-color:#FCEDEA}.field.bad{border-color:#F29A8E}
+.field input{flex:1;min-width:0;height:100%;background:none;border:0;outline:0;color:#fff;font:400 15px Inter,sans-serif}
+.field input::placeholder{color:#C9A9A1}
+.field button{width:46px;height:42px;border-radius:999px;display:grid;place-items:center;background:#FCEDEA;color:var(--ink);transition:transform .3s var(--ease)}
+.field button:hover{transform:translateX(3px)}
+.field svg{width:26px;height:11px;fill:none;stroke:currentColor;stroke-width:1.3}
+.foot-news small{display:block;margin-top:10px;font:400 12px/1.3 Inter,sans-serif;color:#C9A9A1}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(246,230,224,.16);font:400 13px/1.4 Inter,sans-serif;color:#C9A9A1}
+.legal{display:flex;gap:22px}.legal a:hover{color:#fff}
+@media (max-width:1000px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand,.foot-news{grid-column:span 1}}
+@media (max-width:560px){.foot-grid{grid-template-columns:1fr;gap:34px}.foot-cta{align-items:flex-start}.foot-bottom{flex-direction:column;align-items:flex-start;gap:10px}}

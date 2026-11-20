@@ -1,0 +1,16 @@
+.insta{background:linear-gradient(#FAE4E0,var(--wall-bottom) 40%,#FBE9E5)}
+.insta-head{text-align:center;display:flex;flex-direction:column;align-items:center}
+.insta-head .kicker::after{display:none}
+.insta-head .kicker::before{content:"";width:70px;height:1px;background:var(--accent)}
+.insta-head .lead{margin-top:18px;max-width:520px}
+.insta-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(10px,1.4vw,20px);margin-top:clamp(36px,5vw,64px)}
+.tile{position:relative;display:block;aspect-ratio:1;border-radius:clamp(14px,1.6vw,24px);overflow:hidden;background:#F7DFD3;box-shadow:0 10px 26px rgba(150,80,64,.1)}
+.tile>img,.tile>svg{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.tile:hover>img,.tile:hover>svg{transform:scale(1.08)}
+.over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(59,26,24,.45);color:#fff;font:600 15px Inter,sans-serif;opacity:0;transition:opacity .35s}
+.over svg{width:22px;height:22px;fill:#fff}
+.tile:hover .over,.tile:focus-visible .over{opacity:1}
+.insta-cta{display:flex;justify-content:center;margin-top:clamp(32px,4vw,52px)}
+@media (hover:none){.over{opacity:0}}
+@media (max-width:1000px){.insta-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:520px){.insta-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
