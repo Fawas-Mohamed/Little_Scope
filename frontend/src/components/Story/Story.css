@@ -5,7 +5,7 @@
 .arch>img{width:100%;height:100%;object-fit:cover}
 .blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.7}.b1{left:-10%;top:5%;width:60%;height:40%;background:#FFE9D9}.b2{right:-15%;bottom:12%;width:55%;height:35%;background:#F5B9B0}
 .art-bowl{position:absolute;left:50%;bottom:1%;width:90%;transform:translateX(-50%)}
-.art-bowl svg{width:100%!important;height:auto!important}
+.art-bowl svg{width:100%;height:auto}
 .g{position:absolute;display:block}.g svg{width:100%;height:100%;filter:drop-shadow(0 8px 10px rgba(96,52,38,.2))}
 .g1{width:22%;aspect-ratio:1;left:8%;top:30%;animation:float 6s ease-in-out infinite alternate}
 .g2{width:18%;aspect-ratio:1;right:10%;top:22%;animation:float 5s ease-in-out -2s infinite alternate}

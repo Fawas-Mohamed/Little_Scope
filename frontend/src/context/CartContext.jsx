@@ -1,10 +1,24 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
-import { flavours, unitPrice } from '../data/flavours.js';
+import { flavours, toppings, unitPrice } from '../data/flavours.js';
 
 const KEY = 'littlescoop.cart';
 const Ctx = createContext(null);
-const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
-const lineKey = (l) => `${l.flavourId}|${l.size}|${[...l.toppings].sort().join(',')}`;
+const validSizes = new Set(['small', 'regular', 'large']);
+const validToppings = new Set(toppings.map((item) => item.id));
+const load = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (!Array.isArray(stored)) return [];
+    return stored.filter((line) => line && flavours.some((flavour) => flavour.id === line.flavourId))
+      .map((line) => ({
+        flavourId: line.flavourId,
+        size: validSizes.has(line.size) ? line.size : 'regular',
+        toppings: Array.isArray(line.toppings) ? [...new Set(line.toppings.filter((id) => validToppings.has(id)))] : [],
+        qty: Math.max(1, Math.min(20, Number.isFinite(Number(line.qty)) ? Math.trunc(Number(line.qty)) : 1)),
+      }));
+  } catch { return []; }
+};
+const lineKey = (l) => `${l.flavourId}|${l.size}|${(Array.isArray(l.toppings) ? l.toppings : []).slice().sort().join(',')}`;
 
 function reducer(lines, a) {
   switch (a.type) {

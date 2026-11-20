@@ -3,16 +3,40 @@ import { sizes, toppings } from '../../data/flavours.js';
 import { bowlImg } from '../../data/productImages.js';
 import { useCart } from '../../context/CartContext.jsx';
 import { placeStorefrontOrder } from '../../admin/store/persist.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './CartDrawer.css';
 
 const FREE_AT = 50;
 const money = (n) => `$${n.toFixed(2)}`;
 
-export default function CartDrawer({ open, onClose, onToast }) {
+export default function CartDrawer({ open, onClose }) {
   const { lines, subtotal, setQty, remove, clear } = useCart();
   const [step, setStep] = useState('cart'), [f, setF] = useState({ name: '', email: '', phone: '', address: '' }), [err, setErr] = useState({}), [order, setOrder] = useState(null);
+  const panelRef = useRef(null), closeRef = useRef(null), lastFocus = useRef(null);
   useEffect(() => { if (!open) { const t = setTimeout(() => { setStep('cart'); setErr({}); }, 400); return () => clearTimeout(t); } return undefined; }, [open]);
+  useEffect(() => {
+    const panel = panelRef.current;
+    panel?.toggleAttribute('inert', !open);
+    if (!open) return undefined;
+    lastFocus.current = document.activeElement;
+    const focusTimer = setTimeout(() => closeRef.current?.focus({ preventScroll: true }), 0);
+    const key = (e) => {
+      if (e.key !== 'Tab' || !panelRef.current) return;
+      const focusable = [...panelRef.current.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+        .filter((node) => !node.closest('[inert]') && node.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (!panelRef.current.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', key);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', key);
+      if (lastFocus.current?.isConnected) lastFocus.current.focus({ preventScroll: true });
+    };
+  }, [open]);
   const place = (e) => {
     e.preventDefault(); const er = {};
     if (f.name.trim().length < 2) er.name = 'Enter your name.';
@@ -27,8 +51,8 @@ export default function CartDrawer({ open, onClose, onToast }) {
   return (
     <>
       <div className={`scrim ${open ? 'on' : ''}`} onClick={onClose} aria-hidden="true" />
-      <aside className={`cart-drawer ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden={!open}>
-        <button className="drawer-close" onClick={onClose} aria-label="Close cart" tabIndex={open ? 0 : -1}><i /><i /></button>
+      <aside className={`cart-drawer ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden={!open} ref={panelRef}>
+        <button className="drawer-close" ref={closeRef} onClick={onClose} aria-label="Close cart" tabIndex={open ? 0 : -1}><i /><i /></button>
         <h2>{step === 'done' ? 'Thank you!' : step === 'checkout' ? 'Checkout' : 'Your scoops.'}</h2>
         {step === 'cart' && <>
           <div className="drawer-body">
@@ -59,7 +83,7 @@ export default function CartDrawer({ open, onClose, onToast }) {
           <form className="drawer-body co-form" onSubmit={place} noValidate>
             <p className="empty" style={{ margin: '4px 0 6px' }}>Delivery details for your {lines.reduce((n, l) => n + l.qty, 0)} scoops · {money(subtotal)}</p>
             {[['name', 'Full name', 'text'], ['email', 'Email', 'email'], ['phone', 'Phone (optional)', 'tel'], ['address', 'Delivery address', 'text']].map(([k, label, type]) => (
-              <label key={k} className={err[k] ? 'bad' : ''}><span>{label}</span><input type={type} value={f[k]} onChange={set(k)} />{err[k] && <small>{err[k]}</small>}</label>
+              <label key={k} className={err[k] ? 'bad' : ''}><span>{label}</span><input type={type} value={f[k]} onChange={set(k)} aria-invalid={Boolean(err[k])} aria-describedby={err[k] ? `checkout-${k}-error` : undefined} />{err[k] && <small id={`checkout-${k}-error`} role="alert">{err[k]}</small>}</label>
             ))}
             <div className="co-actions"><button type="button" className="back" onClick={() => setStep('cart')}>Back</button><button className="checkout" type="submit">Place order · {money(subtotal + (subtotal >= FREE_AT ? 0 : 3.5))}</button></div>
             <p className="note">Demo checkout: no payment is taken. The order appears in the admin panel.</p>

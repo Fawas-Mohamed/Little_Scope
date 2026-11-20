@@ -49,10 +49,11 @@ export default function Footer({ onToast }) {
             <h3>Sweet news</h3>
             <p>New flavours and little treats, once a month.</p>
             <div className={`field ${error ? 'bad' : ''}`}>
-              <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(false); }} placeholder="Your email" aria-label="Email address" aria-invalid={error} />
+              <label className="sr-only" htmlFor="newsletter-email">Email address</label>
+              <input id="newsletter-email" type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(false); }} placeholder="Your email" aria-invalid={error} aria-describedby={error ? 'newsletter-error' : undefined} />
               <button type="submit" aria-label="Subscribe"><svg viewBox="0 0 36 12"><path d="M0 6h35M30 1l5 5-5 5" /></svg></button>
             </div>
-            <small>{error ? 'Please enter a valid email address.' : 'No spam. Unsubscribe anytime.'}</small>
+            <small id={error ? 'newsletter-error' : undefined} role={error ? 'alert' : undefined}>{error ? 'Please enter a valid email address.' : 'No spam. Unsubscribe anytime.'}</small>
           </form>
         </div>
 

@@ -34,7 +34,11 @@ export default function App() {
     return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); };
   }, []);
   useEffect(() => { const open = () => setCartOpen(true); window.addEventListener('open-cart', open); return () => window.removeEventListener('open-cart', open); }, []);
-  useEffect(() => { document.body.classList.toggle('dim', qv.open || cartOpen); }, [qv.open, cartOpen]);
+  useEffect(() => {
+    document.body.classList.toggle('dim', qv.open || cartOpen);
+    return () => document.body.classList.remove('dim');
+  }, [qv.open, cartOpen]);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
   useEffect(() => {
     if (!qv.open && !cartOpen) return undefined;
     const root = document.documentElement, body = document.body;
@@ -72,8 +76,9 @@ export default function App() {
 
   return (
     <>
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <Header active={active} overHero={overHero} onCart={() => setCartOpen(true)} />
-      <main>
+      <main id="main-content">
         <Hero onOrder={toShowcase} />
         <Story />
         <div id="flavours" className="showcase-track">

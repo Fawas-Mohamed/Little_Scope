@@ -10,10 +10,35 @@ export function useEsc(on, fn) {
 function Layer({ open, onClose, title, subtitle, children, footer, kind, width }) {
   const ref = useRef(null);
   useEsc(open, onClose);
-  useEffect(() => { if (open) { const t = setTimeout(() => ref.current?.querySelector('input,select,textarea,button')?.focus({ preventScroll: true }), 80); document.body.style.overflow = 'hidden'; return () => { clearTimeout(t); document.body.style.overflow = ''; }; } return undefined; }, [open]);
+  useEffect(() => {
+    const panel = ref.current;
+    panel?.toggleAttribute('inert', !open);
+    if (!open) return undefined;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const timer = setTimeout(() => panel?.querySelector('input,select,textarea,button')?.focus({ preventScroll: true }), 80);
+    const trap = (event) => {
+      if (event.key !== 'Tab' || !ref.current) return;
+      const focusable = [...ref.current.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+        .filter((node) => !node.closest('[inert]') && node.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (!ref.current.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+      else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', trap);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', trap);
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, [open]);
   return (
     <div className={`a-layer ${kind} ${open ? 'open' : ''}`} aria-hidden={!open}>
-      <div className="a-scrim" onClick={onClose} />
+      <button type="button" className="a-scrim" aria-label="Close dialog" onClick={onClose} />
       <section className="a-panel" ref={ref} style={width ? { '--w': width } : undefined} role="dialog" aria-modal="true" aria-label={title}>
         <header><div><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div><button className="a-icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button></header>
         <div className="a-panel-body">{open ? children : null}</div>
@@ -40,7 +65,7 @@ export const Toggle = ({ checked, onChange, label }) => (
   <button type="button" role="switch" aria-checked={checked} aria-label={label} className={`a-switch ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)}><i /></button>
 );
 
-export const Avatar = ({ name, size = 36, color }) => <span className="a-avatar" style={{ width: size, height: size, fontSize: size * .38, background: color || undefined }}>{initials(name)}</span>;
+export const Avatar = ({ name, size = 36, color, decorative = false }) => <span className="a-avatar" aria-hidden={decorative || undefined} style={{ width: size, height: size, fontSize: size * .38, background: color || undefined }}>{initials(name)}</span>;
 
 export function Field({ label, error, hint, children, className = '' }) {
   return <label className={`a-field ${error ? 'bad' : ''} ${className}`}><span>{label}</span>{children}{error ? <small className="err">{error}</small> : hint ? <small>{hint}</small> : null}</label>;
@@ -67,4 +92,4 @@ export function Toasts({ toasts }) {
   return <div className="a-toasts" aria-live="polite">{toasts.map((t) => <div key={t.id} className={`a-toast ${t.kind}`}><Icon name={t.kind === 'err' ? 'alert' : 'check'} size={18} />{t.message}</div>)}</div>;
 }
 
-export const Stars = ({ n }) => <span className="a-stars" aria-label={`${n} of 5`}>{[1, 2, 3, 4, 5].map((i) => <svg key={i} viewBox="0 0 24 24" className={i <= n ? 'on' : ''}><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" /></svg>)}</span>;
+export const Stars = ({ n }) => <span className="a-stars" role="img" aria-label={`${n} of 5`}>{[1, 2, 3, 4, 5].map((i) => <svg key={i} viewBox="0 0 24 24" className={i <= n ? 'on' : ''}><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" /></svg>)}</span>;

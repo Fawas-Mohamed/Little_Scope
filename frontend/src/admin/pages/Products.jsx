@@ -6,6 +6,8 @@ import Icon from '../ui/Icon.jsx';
 import { Badge, Toggle, Pager, Empty, Modal, Confirm, Field } from '../ui/kit.jsx';
 
 const blank = () => ({ id: '', name: '', sku: '', category: 'Classic', price: '', cost: '', stock: '', status: 'active', popular: false, color: '#F4E2AE', description: '', image: '', flavourId: null });
+const readView = () => { try { return localStorage.getItem('ls.admin.pview') || 'table'; } catch { return 'table'; } };
+const saveView = (value) => { try { localStorage.setItem('ls.admin.pview', value); } catch { /* View preference is optional. */ } };
 
 // downscale uploads so the demo data stays small enough for localStorage
 function readImage(file) {
@@ -81,14 +83,16 @@ function ProductForm({ product, onClose }) {
 
 export default function Products({ id }) {
   const { products, orders, settings, dispatch, toast } = useAdmin();
-  const [q, setQ] = useState(''), [cat, setCat] = useState('all'), [st, setSt] = useState('all'), [view, setView] = useState(() => localStorage.getItem('ls.admin.pview') || 'table');
+  const [q, setQ] = useState(''), [cat, setCat] = useState('all'), [st, setSt] = useState('all'), [view, setView] = useState(readView);
   const [edit, setEdit] = useState(null), [del, setDel] = useState(null);
   const sold = useMemo(() => { const m = {}; orders.filter((o) => o.status !== 'cancelled' && o.status !== 'refunded').forEach((o) => o.items.forEach((i) => { m[i.productId] = (m[i.productId] || 0) + i.qty; })); return m; }, [orders]);
   const rows = useMemo(() => { const t = q.trim().toLowerCase(); return products.filter((p) => (cat === 'all' || p.category === cat) && (st === 'all' || (st === 'low' ? p.stock <= settings.lowStockLevel : p.status === st)) && (!t || p.name.toLowerCase().includes(t) || p.sku.toLowerCase().includes(t))); }, [products, q, cat, st, settings.lowStockLevel]);
   const pg = usePager(rows, view === 'grid' ? 12 : 10);
-  useEffect(() => pg.setPage(1), [q, cat, st, view]); // eslint-disable-line
-  useEffect(() => { if (id) { const p = products.find((x) => x.id === id); if (p) setEdit(p); go('/admin/products'); } }, [id]); // eslint-disable-line
-  const setV = (v) => { setView(v); localStorage.setItem('ls.admin.pview', v); };
+  const { setPage } = pg;
+  useEffect(() => setPage(1), [q, cat, st, view, setPage]);
+  const linkedProduct = useMemo(() => (id ? products.find((x) => x.id === id) : null), [id, products]);
+  useEffect(() => { if (linkedProduct) { setEdit(linkedProduct); go('/admin/products'); } }, [linkedProduct]);
+  const setV = (v) => { setView(v); saveView(v); };
   const toggle = (p, status) => { dispatch({ type: 'product/save', product: { ...p, status } }); toast(`${p.name} is now ${status}`); };
   const exportCsv = () => { downloadCSV('products.csv', [['SKU', 'Name', 'Category', 'Price', 'Cost', 'Stock', 'Status', 'Sold'], ...rows.map((p) => [p.sku, p.name, p.category, p.price, p.cost, p.stock, p.status, sold[p.id] || 0])]); toast(`Exported ${rows.length} products`); };
   const Stock = ({ p }) => (

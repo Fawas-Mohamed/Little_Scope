@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AdminProvider, useAdmin, useAuth, signIn, signOut } from './store/AdminStore.jsx';
-import { useRoute, go, ago, money, initials } from './ui/util.js';
+import { useRoute, go, ago, money } from './ui/util.js';
 import Icon from './ui/Icon.jsx';
-import { Toasts, Avatar, Badge } from './ui/kit.jsx';
+import { Toasts, Avatar } from './ui/kit.jsx';
 import BowlArt from '../art/BowlArt.jsx';
 import { flavours } from '../data/flavours.js';
 import Dashboard from './pages/Dashboard.jsx';
@@ -36,12 +36,12 @@ function Login() {
         <h2>Run the shop,<br /><em>one scoop</em> at a time.</h2>
         <p>Orders, flavours, customers and reviews, all in one calm place.</p>
       </aside>
-      <main className="a-login-form">
+      <main id="admin-content" className="a-login-form">
         <form onSubmit={submit} noValidate>
           <p className="a-kicker">Admin panel</p>
           <h1>Welcome back</h1>
           <p className="sub">Sign in to manage your store.</p>
-          <label className="a-field"><span>Email</span><input type="email" autoComplete="username" value={email} onChange={(e) => { setEmail(e.target.value); setErr(''); }} placeholder="admin@littlescoop.com" autoFocus /></label>
+          <label className="a-field"><span>Email</span><input type="email" autoComplete="username" value={email} onChange={(e) => { setEmail(e.target.value); setErr(''); }} placeholder="admin@littlescoop.com" /></label>
           <label className="a-field"><span>Password</span>
             <div className="pw"><input type={show ? 'text' : 'password'} autoComplete="current-password" value={pw} onChange={(e) => { setPw(e.target.value); setErr(''); }} placeholder="••••••••" /><button type="button" onClick={() => setShow(!show)} aria-label={show ? 'Hide password' : 'Show password'}><Icon name="eye" size={18} /></button></div>
           </label>
@@ -137,7 +137,7 @@ function Shell({ user, parts }) {
           <button onClick={() => { signOut(); go('/admin/login'); }}><Icon name="logout" size={18} />Sign out</button>
         </div>
       </aside>
-      <div className="a-scrim-nav" onClick={() => setMenu(false)} />
+      <button className="a-scrim-nav" aria-label="Close navigation" onClick={() => setMenu(false)} />
       <div className="a-main">
         <header className="a-top">
           <button className="a-icon-btn menu-btn" onClick={() => setMenu(true)} aria-label="Open menu"><Icon name="menu" size={22} /></button>
@@ -145,7 +145,7 @@ function Shell({ user, parts }) {
           <div className="a-top-right">
             <Notifications />
             <div className="a-pop-wrap" ref={pbox}>
-              <button className="a-profile" onClick={() => setProf(!prof)} aria-expanded={prof}><Avatar name={user.name} size={36} /><span><b>{user.name}</b><small>Administrator</small></span><Icon name="down" size={16} /></button>
+              <button className="a-profile" onClick={() => setProf(!prof)} aria-expanded={prof}><Avatar name={user.name} size={36} decorative /><span><b>{user.name}</b><small>Administrator</small></span><Icon name="down" size={16} /></button>
               {prof && <div className="a-pop prof">
                 <div className="who"><Avatar name={user.name} size={42} /><span><b>{user.name}</b><small>{user.email}</small></span></div>
                 <button onClick={() => { go('/admin/settings'); setProf(false); }}><Icon name="settings" size={18} />Settings</button>
@@ -155,7 +155,7 @@ function Shell({ user, parts }) {
             </div>
           </div>
         </header>
-        <main className="a-content" key={page}>{view}</main>
+        <main id="admin-content" className="a-content" key={page}>{view}</main>
       </div>
       <Toasts toasts={toasts} />
     </div>
@@ -175,5 +175,5 @@ function Gate() {
 
 export default function AdminApp() {
   useEffect(() => { document.body.classList.add('is-admin'); window.scrollTo(0, 0); return () => document.body.classList.remove('is-admin'); }, []);
-  return <AdminProvider><div className="adm"><Gate /></div></AdminProvider>;
+  return <AdminProvider><div className="adm"><a className="skip-link" href="#admin-content">Skip to content</a><Gate /></div></AdminProvider>;
 }

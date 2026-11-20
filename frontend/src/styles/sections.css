@@ -1,5 +1,5 @@
 /* shared section system: same palette, type and spacing everywhere */
-.sec{position:relative;padding:clamp(72px,10vw,140px) clamp(20px,6vw,96px)}
+.sec{position:relative;padding:clamp(72px,10vw,140px) clamp(20px,6vw,96px);scroll-margin-top:var(--nav-height)}
 .sec-inner{max-width:1280px;margin:0 auto}
 .kicker{margin:0;display:flex;align-items:center;gap:14px;font:500 12px/1 Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--ink)}
 .kicker::after{content:"";width:70px;height:1px;background:var(--accent)}

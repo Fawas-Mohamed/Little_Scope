@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { lighten, darken, mix, rng } from './colors.js';
+import { lighten, darken, rng } from './colors.js';
 
 /** Hero product: a scoop on a ribbed brand cup. Drawn in the 600 x 920 box used by the hero cup placement (ratio of a real cut-out). */
 export default function HeroCup({ scoop, band, name }) {

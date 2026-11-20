@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { Garnish } from './Garnish.jsx';
-import { lighten, darken, mix, rng } from './colors.js';
+import { lighten, darken, rng } from './colors.js';
 
 /**
  * One showcase bowl (or cone) drawn in the sprite-cell coordinate system: 876 x 1168, base point (438, 1100).

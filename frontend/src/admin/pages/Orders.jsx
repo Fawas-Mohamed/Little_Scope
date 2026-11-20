@@ -13,7 +13,7 @@ function OrderDrawer({ id }) {
   const { orders, settings, dispatch, toast } = useAdmin();
   const o = orders.find((x) => x.id === id);
   const [note, setNote] = useState(''), [confirm, setConfirm] = useState(null);
-  useEffect(() => setNote(o?.note || ''), [o?.id]); // eslint-disable-line
+  useEffect(() => setNote(o?.note || ''), [o?.id, o?.note]);
   const close = () => go('/admin/orders');
   const set = (status) => { dispatch({ type: 'order/status', id: o.id, status }); toast(`${o.id} marked ${STATUS_LABEL[status].toLowerCase()}`); };
   const idx = o ? FLOW.indexOf(o.status) : -1, next = idx >= 0 && idx < 3 ? FLOW[idx + 1] : null;
@@ -68,7 +68,8 @@ export default function Orders({ id }) {
     return list.sort((a, b) => (sort.key === 'total' ? (a.total - b.total) * m : a.createdAt.localeCompare(b.createdAt) * m));
   }, [orders, q, status, pay, range, sort]);
   const pg = usePager(rows, 10);
-  useEffect(() => { pg.setPage(1); setSel(new Set()); }, [q, status, pay, range]); // eslint-disable-line
+  const { setPage } = pg;
+  useEffect(() => { setPage(1); setSel(new Set()); }, [q, status, pay, range, setPage]);
   const toggleSort = (key) => setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'desc' }));
   const allOn = pg.slice.length > 0 && pg.slice.every((o) => sel.has(o.id));
   const flip = (oid) => setSel((s) => { const n = new Set(s); n.has(oid) ? n.delete(oid) : n.add(oid); return n; });
@@ -93,16 +94,16 @@ export default function Orders({ id }) {
           <div className="a-table-wrap"><table className="a-table stack">
             <thead><tr><th className="chk"><input type="checkbox" checked={allOn} onChange={() => setSel(allOn ? new Set() : new Set(pg.slice.map((o) => o.id)))} aria-label="Select page" /></th><th>Order</th><th>Customer</th><th><Sort k="createdAt">Date</Sort></th><th>Items</th><th><Sort k="total">Total</Sort></th><th>Payment</th><th>Status</th><th /></tr></thead>
             <tbody>{pg.slice.map((o) => (
-              <tr key={o.id} className={`click ${sel.has(o.id) ? 'sel' : ''}`} onClick={() => go(`/admin/orders/${o.id}`)}>
-                <td className="chk" onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={sel.has(o.id)} onChange={() => flip(o.id)} aria-label={`Select ${o.id}`} /></td>
-                <td data-label="Order"><b>{o.id}</b></td>
+              <tr key={o.id} className={sel.has(o.id) ? 'sel' : ''}>
+                <td className="chk"><input type="checkbox" checked={sel.has(o.id)} onChange={() => flip(o.id)} aria-label={`Select ${o.id}`} /></td>
+                <td data-label="Order"><button type="button" className="a-table-link" onClick={() => go(`/admin/orders/${o.id}`)}>{o.id}</button></td>
                 <td data-label="Customer"><span className="who"><Avatar name={o.customerName} size={30} /><span><b>{o.customerName}</b><small>{o.email}</small></span></span></td>
                 <td data-label="Date"><span>{fmtDate(o.createdAt)}<small>{ago(o.createdAt)}</small></span></td>
                 <td data-label="Items">{o.items.reduce((n, i) => n + i.qty, 0)}</td>
                 <td data-label="Total"><b>{money(o.total, settings.currency)}</b></td>
                 <td data-label="Payment" className="cap">{o.payment}</td>
                 <td data-label="Status"><Badge>{STATUS_LABEL[o.status]}</Badge></td>
-                <td className="act"><button className="a-icon-btn" aria-label={`Open ${o.id}`}><Icon name="eye" size={18} /></button></td>
+                <td className="act"><button className="a-icon-btn" onClick={() => go(`/admin/orders/${o.id}`)} aria-label={`Open ${o.id}`}><Icon name="eye" size={18} /></button></td>
               </tr>))}</tbody>
           </table></div>
         )}

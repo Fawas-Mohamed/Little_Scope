@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 // which section crosses the middle of the screen
 export function useScrollSpy(ids) {
   const [active, setActive] = useState(ids[0]);
+  const idsKey = ids.join('|');
   useEffect(() => {
+    const idList = idsKey.split('|');
     const onPinChange = (event) => setActive(event.detail);
     window.addEventListener('showcasepinchange', onPinChange);
     const regular = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) setActive(entry.target.id); });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ids.filter((id) => id !== 'flavours').forEach((id) => {
+    idList.filter((id) => id !== 'flavours').forEach((id) => {
       const el = document.getElementById(id);
       if (el) regular.observe(el);
     });
@@ -21,7 +23,7 @@ export function useScrollSpy(ids) {
     const releaseTop = track && sticky ? trackTop + track.clientHeight - sticky.clientHeight : 0;
     if (track && sticky) {
       if (window.scrollY >= trackTop && window.scrollY <= releaseTop) setActive('flavours');
-      else if (window.scrollY > releaseTop) setActive(ids[ids.indexOf('flavours') + 1] ?? ids[ids.length - 1]);
+      else if (window.scrollY > releaseTop) setActive(idList[idList.indexOf('flavours') + 1] ?? idList[idList.length - 1]);
     }
     let lastY = window.scrollY;
     const pin = new IntersectionObserver((entries) => {
@@ -30,7 +32,7 @@ export function useScrollSpy(ids) {
       entries.forEach((entry) => {
         if (entry.target === start) {
           if (entry.isIntersecting && direction > 0) setActive('flavours');
-          else if (!entry.isIntersecting && direction < 0) setActive(ids[ids.indexOf('flavours') - 1] ?? ids[0]);
+          else if (!entry.isIntersecting && direction < 0) setActive(idList[idList.indexOf('flavours') - 1] ?? idList[0]);
         } else if (entry.target === end) {
           if (entry.isIntersecting || direction < 0) setActive('flavours');
           else if (direction > 0) setActive('reviews');
@@ -44,6 +46,6 @@ export function useScrollSpy(ids) {
       regular.disconnect();
       pin.disconnect();
     };
-  }, [ids.join('|')]); // eslint-disable-line
+  }, [idsKey]);
   return active;
 }

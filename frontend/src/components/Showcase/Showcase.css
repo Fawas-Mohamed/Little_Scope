@@ -80,7 +80,7 @@
 .showcase.mobile .stage{transform-origin:0 0}
 .m-info{padding:8px 22px 0;position:relative}
 .m-info .ui-info{position:static;width:auto}
-.m-info .info h2{font-size:30px!important;line-height:32px;margin:8px 0 0}
+.m-info .info h2{font-size:30px;line-height:32px;margin:8px 0 0}
 .m-info .rule{margin:8px 0}
 .m-info .tagline{width:auto;font-size:17px;line-height:21px}
 .m-info .explore{margin-top:8px;font-size:11px}
@@ -101,7 +101,7 @@
 @media (max-height:500px){
   .showcase.mobile .stage-area{height:42vh}
   .m-info{padding:5px 18px 0}
-  .m-info .info h2{font-size:26px!important;line-height:28px;margin:4px 0 0}
+  .m-info .info h2{font-size:26px;line-height:28px;margin:4px 0 0}
   .m-info .rule{margin:4px 0}
   .m-info .tagline{font-size:15px;line-height:18px}
   .m-info .explore{margin-top:4px}

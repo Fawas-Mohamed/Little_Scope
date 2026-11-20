@@ -46,3 +46,13 @@ Desktop.ini
 .vscode/
 .idea/
 *.code-workspace
+
+frontend/qa/screenshots/
+frontend/qa/*.json
+test-results/
+playwright-report/
+frontend/qa/results/
+frontend/qa/screenshots/
+frontend/qa/*.json
+test-results/
+playwright-report/

@@ -3,6 +3,7 @@ import { loadState, saveState, KEY, SESSION } from './persist.js';
 import { makeSeed } from './seed.js';
 
 const Ctx = createContext(null);
+let sessionFallback = null;
 
 function reducer(s, a) {
   switch (a.type) {
@@ -38,10 +39,13 @@ export function AdminProvider({ children }) {
   }, []);
 
   const [toasts, setToasts] = useState([]);
+  const toastTimers = useRef(new Map());
+  useEffect(() => () => { toastTimers.current.forEach(clearTimeout); toastTimers.current.clear(); }, []);
   const toast = useCallback((message, kind = 'ok') => {
     const id = Math.random().toString(36).slice(2);
     setToasts((t) => [...t, { id, message, kind }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+    const timer = setTimeout(() => { setToasts((t) => t.filter((x) => x.id !== id)); toastTimers.current.delete(id); }, 3200);
+    toastTimers.current.set(id, timer);
   }, []);
 
   const value = useMemo(() => ({ ...state, dispatch, toast, toasts }), [state, toasts, toast]);
@@ -50,10 +54,10 @@ export function AdminProvider({ children }) {
 export const useAdmin = () => useContext(Ctx);
 
 export function useAuth() {
-  const read = () => { try { return JSON.parse(localStorage.getItem(SESSION)); } catch { return null; } };
+  const read = () => { try { return JSON.parse(localStorage.getItem(SESSION)) || sessionFallback; } catch { return sessionFallback; } };
   const [user, setUser] = useState(read);
   useEffect(() => { const on = () => setUser(read()); window.addEventListener('ls-admin-session', on); return () => window.removeEventListener('ls-admin-session', on); }, []);
   return user;
 }
-export function signIn(user) { localStorage.setItem(SESSION, JSON.stringify(user)); window.dispatchEvent(new Event('ls-admin-session')); }
-export function signOut() { localStorage.removeItem(SESSION); window.dispatchEvent(new Event('ls-admin-session')); }
+export function signIn(user) { sessionFallback = user; try { localStorage.setItem(SESSION, JSON.stringify(user)); } catch { /* Keep the session for this tab when storage is unavailable. */ } window.dispatchEvent(new Event('ls-admin-session')); }
+export function signOut() { sessionFallback = null; try { localStorage.removeItem(SESSION); } catch { /* The in-memory session is cleared either way. */ } window.dispatchEvent(new Event('ls-admin-session')); }

@@ -41,9 +41,9 @@ function wordLayout(text, mobileLimit) {
   return { size: Math.min(445, target / (ink - .035 * (n - 1))), ls: '-.035em' };
 }
 
-function HeroSlide({ slide, u, vp, fontsReady, role, reg }) {
+function HeroSlide({ slide, u, vp, role, reg }) {
   const cup = heroImg(slide.id), garn = garnishImgs(slide.id);
-  const word = useMemo(() => wordLayout(slide.name, vp.mobile ? Math.min(1440, vp.w / u) * .92 : null), [slide.name, fontsReady, vp.mobile, vp.w, u]); // eslint-disable-line
+  const word = wordLayout(slide.name, vp.mobile ? Math.min(1440, vp.w / u) * .92 : null);
   const baseline = 403.5 + (.698 * word.size) / 2, top = baseline - .85 * word.size;
   const bob = useMemo(() => { const r = rng(slide.name.charCodeAt(0) * 17 + slide.name.length); return Array.from({ length: 7 }, () => ({ d: 3.2 + r() * 1.8, l: -r() * 4 })); }, [slide.name]);
   const piece = (p, key, layer, bi) => (
@@ -57,7 +57,7 @@ function HeroSlide({ slide, u, vp, fontsReady, role, reg }) {
     <section ref={(n) => reg.slide(slide.id, n)} className="hero-slide" style={{ background: slide.color, zIndex: role === 'out' ? 2 : 1 }} aria-hidden={role === 'in'}>
       <div className="hero-frame" style={{ width: 1440 * u, height: 900 * u, '--u': `${u}px` }}>
         <div className="hero-layer" ref={(n) => reg.layer(slide.id, 'word', n)}>
-          <div className="hero-word" style={{ top: top * u, fontSize: word.size * u, letterSpacing: word.ls }}>{slide.name}</div>
+          <h1 className="hero-word" style={{ top: top * u, fontSize: word.size * u, letterSpacing: word.ls }}>{slide.name}</h1>
         </div>
         <div className="hero-layer" ref={(n) => reg.layer(slide.id, 'shadow', n)}>
           {SHADOWS.map(([cx, cy, w, h], i) => <i key={i} className="floor-shadow" style={{ left: (cx - w / 2) * u, top: (cy - h / 2) * u, width: w * u, height: h * u }} />)}
@@ -80,7 +80,7 @@ const Hero = forwardRef(function Hero({ onOrder }, ref) {
   const u = vp.mobile ? Math.max(.1, Math.min(vp.w / 640, (vp.h - 200) / 620)) : Math.min(vp.w / 1440, vp.h / 900);
   const [active, setActive] = useState(0);
   const [trans, setTrans] = useState(null);
-  const [fontsReady, setFontsReady] = useState(false);
+  const [, setFontsReady] = useState(false);
   const root = useRef(null), slideNodes = useRef({}), layerNodes = useRef({});
   const busy = useRef(false), paused = useRef(0), inView = useRef(true), start = useRef(null), intro = useRef([]);
   const activeRef = useRef(0), reducedRef = useRef(reduced), uRef = useRef(u), goRef = useRef(() => {});
@@ -174,7 +174,7 @@ const Hero = forwardRef(function Hero({ onOrder }, ref) {
   const shown = trans ? [trans.from, trans.to] : [active];
   return (
     <section id="top" ref={root} className={`hero ${vp.mobile ? 'mobile' : ''}`} onPointerDown={(e) => { start.current = { x: e.clientX, y: e.clientY }; }}>
-      {shown.map((i) => <HeroSlide key={heroFlavours[i].id} slide={heroFlavours[i]} u={u} vp={vp} fontsReady={fontsReady} reg={reg} role={trans ? (i === trans.from ? 'out' : 'in') : ''} />)}
+      {shown.map((i) => <HeroSlide key={heroFlavours[i].id} slide={heroFlavours[i]} u={u} vp={vp} reg={reg} role={trans ? (i === trans.from ? 'out' : 'in') : ''} />)}
       <button className="hero-arrow prev rise" style={{ animationDelay: '490ms' }} aria-label="Previous flavour" onClick={() => go(-1)}><svg viewBox="0 0 28 28"><path d="M24 14H4M12 6l-8 8 8 8" /></svg></button>
       <div className="hero-dots rise" style={{ animationDelay: '530ms' }} role="tablist" aria-label="Hero flavours">
         {heroFlavours.map((f, i) => <button key={f.id} role="tab" aria-selected={(trans ? trans.to : active) === i} aria-label={f.name} className={(trans ? trans.to : active) === i ? 'on' : ''} onClick={() => go(0, i)}><span>{f.name}</span></button>)}

@@ -22,6 +22,7 @@ export default function QuickView({ flavour, open, onClose, onAdd }) {
 
   // reset every time a flavour opens: Regular preselected
   useEffect(() => {
+    panelRef.current?.toggleAttribute('inert', !open);
     if (!open) return undefined;
     setSize('regular'); setTops([]); setQty(1); setPhoto(0); setAdded(false);
     last.current = document.activeElement;
@@ -34,11 +35,13 @@ export default function QuickView({ flavour, open, onClose, onAdd }) {
     const key = (e) => {
       if (e.key === 'ArrowLeft') setPhoto((p) => (p + 2) % 3);
       if (e.key === 'ArrowRight') setPhoto((p) => (p + 1) % 3);
-      if (e.key === 'Tab' && panelRef.current) { // keep focus inside the dialog
-        const f = [...panelRef.current.querySelectorAll('button,input')].filter((n) => !n.disabled);
+      if (e.key === 'Tab' && panelRef.current) {
+        const f = [...panelRef.current.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+          .filter((n) => !n.closest('[inert]') && n.getClientRects().length);
         if (!f.length) return;
         const first = f[0], end = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); end.focus(); }
+        if (!panelRef.current.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+        else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); end.focus(); }
         else if (!e.shiftKey && document.activeElement === end) { e.preventDefault(); first.focus(); }
       }
     };

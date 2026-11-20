@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flavours } from '../../data/flavours.js';
 import { bowlImg, peekImg, roomImg, bagImg } from '../../data/productImages.js';
 import { useReducedMotion } from '../../hooks/useReducedMotion.js';
@@ -50,7 +50,7 @@ export default function Showcase({ quickOpen, onOpen }) {
   const bowlNodes = useRef([]), indexFillRef = useRef(null), infoRef = useRef(null), pagerCountRef = useRef(null);
   const layoutRef = useRef({ trackTop: 0, step: 1, viewport: 0, width: 0 });
   const posRef = useRef(0), pinnedRef = useRef(false), displayRef = useRef(0), hoverRef = useRef(null);
-  const progressFrame = useRef(0), updateProgressRef = useRef(() => {}), swapTimer = useRef(0);
+  const progressFrame = useRef(0), updateProgressRef = useRef(() => {}), swapTimer = useRef(0), bagTimer = useRef(0);
   const lastWindowSize = useRef({ width: window.innerWidth, height: window.innerHeight });
   const [box, setBox] = useState({ W: 1440, H: 900 });
   const [disp, setDisp] = useState(0), [hover, setHover] = useState(null);
@@ -146,17 +146,17 @@ export default function Showcase({ quickOpen, onOpen }) {
     return { slot, x, y, s, dx, dy, rot, k, opacity: opacityAt(slot, reducedRef.current), z: 100 - Math.floor(slot) };
   };
 
-  const scrollToProduct = (index) => {
+  const scrollToProduct = useCallback((index) => {
     const target = clamp(index, 0, N - 1);
     if (Math.abs(target - posRef.current) < .001) return;
     const { trackTop, step } = layoutRef.current;
     window.scrollTo({ top: trackTop + target * step, behavior: 'smooth' });
-  };
-  const moveBy = (delta) => {
+  }, []);
+  const moveBy = useCallback((delta) => {
     const target = displayRef.current + delta;
     if (target < 0 || target >= N) return;
     scrollToProduct(target);
-  };
+  }, [scrollToProduct]);
   const swapText = (index) => {
     if (index === displayRef.current) return;
     displayRef.current = index;
@@ -220,6 +220,7 @@ export default function Showcase({ quickOpen, onOpen }) {
       window.removeEventListener('scroll', onScroll);
       if (progressFrame.current) cancelAnimationFrame(progressFrame.current);
       clearTimeout(swapTimer.current);
+      clearTimeout(bagTimer.current);
     };
   }, []);
 
@@ -259,7 +260,7 @@ export default function Showcase({ quickOpen, onOpen }) {
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
-  }, []);
+  }, [moveBy]);
 
   // bag dips and settles, its badge pops when something lands
   const prevCount = useRef(count);
@@ -267,7 +268,9 @@ export default function Showcase({ quickOpen, onOpen }) {
     if (count > prevCount.current) {
       bagRef.current?.animate([{ transform: 'none' }, { transform: 'translateY(4px) scale(1.05,.95)', offset: .35 }, { transform: 'translateY(-2px) scale(.98,1.02)', offset: .7 }, { transform: 'none' }], { duration: 420, easing: 'ease-out' });
       bagRef.current?.querySelector('.bag-count')?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)' }, { transform: 'scale(1)' }], { duration: 380 });
-      document.querySelector('.cart-btn')?.classList.add('pop'); setTimeout(() => document.querySelector('.cart-btn')?.classList.remove('pop'), 420);
+      document.querySelector('.cart-btn')?.classList.add('pop');
+      clearTimeout(bagTimer.current);
+      bagTimer.current = setTimeout(() => document.querySelector('.cart-btn')?.classList.remove('pop'), 420);
     }
     prevCount.current = count;
   }, [count]);
@@ -278,7 +281,7 @@ export default function Showcase({ quickOpen, onOpen }) {
   const info = (
     <div className="info" ref={infoRef} aria-live="polite">
       <div className="mask"><span className="count line" style={{ '--i': 0 }}>{pad(disp)} / 0{N}</span></div>
-      <h2 ref={titleRef} style={{ fontSize: fs }}>{f.title.map((t, i) => <div className="mask" key={t}><span className="ln line" style={{ '--i': i + 1 }}>{t}</span></div>)}</h2>
+      <h2 ref={titleRef} style={compact ? undefined : { fontSize: fs }}>{f.title.map((t, i) => <div className="mask" key={t}><span className="ln line" style={{ '--i': i + 1 }}>{t}</span></div>)}</h2>
       <i className="rule fade" style={{ '--i': 0 }} />
       <div className="mask"><p className="tagline line" style={{ '--i': 3 }}>{f.tagline}</p></div>
       <div className="mask"><button className="explore line" style={{ '--i': 4 }} onClick={() => onOpen(f)}>EXPLORE FLAVOUR<svg viewBox="0 0 10 10" width="10" height="10"><path d="M1.5 8.5 8.5 1.5M3 1.5h5.5V7" fill="none" stroke="currentColor" strokeWidth="1" /></svg></button></div>
@@ -304,7 +307,7 @@ export default function Showcase({ quickOpen, onOpen }) {
     <>
     <div className="showcase-pin-marker showcase-pin-start" aria-hidden="true" />
     <section ref={secRef} className={`showcase ${compact ? 'mobile' : ''} ${entered ? 'entered' : ''} ${intro ? 'intro' : ''} ${quickOpen ? 'is-quick' : ''} ${qvAnim ? 'qv-anim' : ''}`}>
-      <div className="stage-area" onPointerMove={onMove} onPointerLeave={() => { hoverRef.current = null; setHover(null); }} onClick={onClick}>
+    <div className="stage-area" role="region" aria-label="Interactive flavour showcase. Use arrow keys to browse." onPointerMove={onMove} onPointerLeave={() => { hoverRef.current = null; setHover(null); }} onPointerUp={onClick}>
         <div className="stage" ref={stageRef} style={stageStyle}>
           <div className="plates anim">
             {!compact && <Plate room={room} mirror side={-1} />}

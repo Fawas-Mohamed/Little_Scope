@@ -30,7 +30,7 @@ export default function Header({ active, overHero, onCart }) {
           ))}
         </nav>
         <div className="nav-actions rise" style={{ animationDelay: '410ms' }}>
-          <button className="cart-btn" onClick={onCart} data-fly-target aria-label={`Open cart, ${count} items`}>
+          <button className="cart-btn" onClick={onCart} data-fly-target>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h9.6L20 7H6.5" /><circle cx="9" cy="19" r="1.5" /><circle cx="17" cy="19" r="1.5" /></svg>
             <span>Cart</span><b>{count}</b>
           </button>

@@ -49,7 +49,7 @@ export default function Reviews() {
       </div>
 
       <div className="track-wrap rv" style={{ '--d': '.2s' }}>
-        <div className="track" ref={track} onScroll={update} tabIndex={0} aria-label="Customer reviews">
+        <div className="track" ref={track} onScroll={update} role="region" tabIndex={0} aria-label="Customer reviews">
           {REVIEWS.map((r) => (
             <article className="review" key={r.name + r.flavour}>
               <Stars />
