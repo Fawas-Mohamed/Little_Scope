@@ -30,7 +30,7 @@ const REVIEW_TEXT = [
 ];
 
 export const defaultSettings = {
-  storeName: 'Little Scoop', email: 'hello@littlescoop.com', phone: '+1 555 0142', address: '24 Meadow Street, Sweetville, 10110', currency: '$',
+  storeName: 'Little Scoop', email: 'https://neirahtech.com', phone: '+94 76 004 1594', address: 'Trincomalee, Colombo, Batticalo and Germany', currency: '$',
   deliveryFee: 3.5, freeThreshold: 50, taxRate: 8, openTime: '10:00', closeTime: '21:00',
   notify: { newOrder: true, lowStock: true, newReview: true, weeklyReport: false },
   lowStockLevel: 15, password: 'admin123', adminName: 'Alex Morgan', adminEmail: 'admin@littlescoop.com',

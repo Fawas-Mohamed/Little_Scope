@@ -40,9 +40,9 @@ export default function Footer({ onToast }) {
 
           <div className="foot-col rv" style={{ '--d': '.22s' }}>
             <h3>Visit us</h3>
-            <p>24 Meadow Street<br />Sweetville, 10110</p>
+            <p>Trincomalee, Colombo<br />Batticalo and Germany</p>
             <p>Mon to Fri · 10am – 9pm<br />Sat and Sun · 9am – 10pm</p>
-            <a href="mailto:hello@littlescoop.com">hello@littlescoop.com</a>
+            <a href="mailto:https://neirahtech.com">https://neirahtech.com</a>
           </div>
 
           <form className="foot-news rv" style={{ '--d': '.28s' }} onSubmit={submit} noValidate>
@@ -60,7 +60,7 @@ export default function Footer({ onToast }) {
         <div className="foot-bottom">
           <span>© 2026 Little Scoop. All rights reserved.</span>
           <span className="legal"><a href="#top" onClick={(e) => e.preventDefault()}>Privacy</a><a href="#top" onClick={(e) => e.preventDefault()}>Terms</a><a href="#/admin">Admin</a></span>
-          <span>Made with love</span>
+          <span>Develop By: NeirahTech</span>
         </div>
       </div>
     </footer>
